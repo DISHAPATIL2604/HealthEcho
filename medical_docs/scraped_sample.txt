@@ -1,0 +1,3 @@
+WHO diabetes overview text sample.
+Fasting glucose above thresholds may indicate diabetes risk possibility.
+HbA1c is recommended for follow-up assessment.

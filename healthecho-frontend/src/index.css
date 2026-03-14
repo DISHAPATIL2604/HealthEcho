@@ -1,0 +1,19 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  margin: 0;
+  font-family: Nunito, system-ui, sans-serif;
+  background: radial-gradient(circle at top left, #dff1ff, #f4f8fb 40%, #eaf3fb 100%);
+  color: #0f2742;
+}
+
+body.dark {
+  background: linear-gradient(180deg, #0b1f33 0%, #0f2d4a 100%);
+  color: #e6f2ff;
+}
