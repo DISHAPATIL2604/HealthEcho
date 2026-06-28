@@ -1,0 +1,679 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes"/>
+<meta name="mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-capable" content="yes"/>
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"/>
+<meta name="theme-color" content="#0D1117"/>
+<meta name="format-detection" content="telephone=no"/>
+<title>HealthEcho — AI Medical Intelligence</title>
+
+<!-- Load Local Configurations & Keys -->
+<script src="config.js"></script>
+<!-- Firebase Initialization Module -->
+<script type="module" src="firebase-init.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<!-- Stylesheet -->
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<div class="app" id="app">
+
+  <!-- DESKTOP SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <div class="logo-icon">
+        <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+      </div>
+      <div>
+        <div class="logo-text">Health<em>Echo</em></div>
+        <div class="logo-sub">AI Medical Intelligence</div>
+      </div>
+    </div>
+    <nav class="sidebar-nav">
+      <button class="sidebar-tab on" data-t="home" onclick="switchToTab('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </button>
+      <button class="sidebar-tab" data-t="chat" onclick="switchToTab('chat')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        AI Consult
+      </button>
+      <button class="sidebar-tab" data-t="upload" onclick="switchToTab('upload')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+        Upload Reports
+      </button>
+      <button class="sidebar-tab" data-t="dashboard" onclick="switchToTab('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </button>
+      <button class="sidebar-tab nav-history-item" data-t="history" onclick="switchToTab('history')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 108.91-7.96"/><polyline points="3 4 3 11 10 11"/></svg>
+        History
+      </button>
+      <button class="sidebar-tab" data-t="hospitals" onclick="switchToTab('hospitals')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Find Doctors
+      </button>
+      <button class="sidebar-tab" data-t="profile" onclick="switchToTab('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </button>
+    </nav>
+    <div class="sidebar-footer">
+      <div id="sidebarBackendBadge" class="backend-badge offline">
+        <div class="backend-dot"></div>
+        <span>AI Offline</span>
+      </div>
+      <div style="margin-top:8px;font-size:10px;color:var(--hint)">HealthEcho v5.0</div>
+    </div>
+  </aside>
+
+  <!-- MAIN AREA -->
+  <div class="main-area">
+
+    <!-- NAV -->
+    <nav class="nav">
+      <div class="nav-logo">
+        <div class="logo-icon">
+          <svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg>
+        </div>
+        <span class="logo-text">Health<em>Echo</em></span>
+      </div>
+      <div class="nav-r" id="navR">
+        <div id="navBackendBadge" class="backend-badge offline" style="display:none">
+          <div class="backend-dot"></div>
+          <span>AI Offline</span>
+        </div>
+        <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle dark/light mode">🌙</button>
+        <button class="btn btn-sm" onclick="showModal('loginModal')">Login</button>
+        <button class="btn btn-p btn-sm" onclick="showModal('signupModal')">Sign up</button>
+      </div>
+    </nav>
+
+    <!-- CONNECTION BANNER -->
+    <div class="conn-banner" id="connBanner"></div>
+
+    <!-- SCREENS -->
+    <div style="flex:1;min-height:0;overflow:hidden;display:flex;flex-direction:column">
+
+      <!-- HOME / LANDING -->
+      <div class="scr on" id="s-home">
+        <div class="pad">
+          <div class="home-hero">
+            <h1>Welcome to Health<em>Echo</em></h1>
+            <p class="home-lead">HealthEcho helps you understand symptoms using trusted public-health references (WHO, ICMR, CDC, and similar), upload reports for a structured lab dashboard, and find nearby care in Amravati. It is an educational tool — not a substitute for a licensed clinician.</p>
+            <div class="home-actions">
+              <button class="btn btn-p" onclick="switchToTab('chat')">Start AI consult</button>
+              <button class="btn btn-outline" onclick="switchToTab('upload')">Upload a report</button>
+              <button class="btn btn-sm" onclick="showRoboGuide()">How it works</button>
+            </div>
+          </div>
+          <div class="card-title">What you can do</div>
+          <div class="feature-grid" style="margin-bottom:20px">
+            <div class="feature-tile">
+              <div class="fi">💬</div>
+              <h3>Guided symptom chat</h3>
+              <p>The assistant asks follow-up questions when your message is too vague or unrelated, so you get safer, more relevant information.</p>
+            </div>
+            <div class="feature-tile">
+              <div class="fi">📋</div>
+              <h3>Report dashboard</h3>
+              <p>Sign in to upload labs, then explore metrics, trends, a plain-language report summary, and talking points for your doctor.</p>
+            </div>
+            <div class="feature-tile">
+              <div class="fi">🏥</div>
+              <h3>Find doctors — Amravati</h3>
+              <p>Browse hospitals and specialties in Amravati and book a demo appointment slot (for your own planning — confirm with the facility).</p>
+            </div>
+            <div class="feature-tile">
+              <div class="fi">📜</div>
+              <h3>History (signed-in)</h3>
+              <p>Consultation history is saved only for logged-in accounts. Guests can use AI consult and Find Doctors; sign in for history, uploads, and synced reports.</p>
+            </div>
+            <div class="feature-tile">
+              <div class="fi">🌙</div>
+              <h3>Light &amp; dark</h3>
+              <p>Use the sun/moon control in the top bar to match your environment. Your choice is remembered on this device.</p>
+            </div>
+            <div class="feature-tile">
+              <div class="fi">🔒</div>
+              <h3>Privacy note</h3>
+              <p>With Ollama running locally, prompts can stay on your machine. Otherwise a fallback model may be used — avoid sharing names or IDs in chat.</p>
+            </div>
+          </div>
+          <div class="comp">⚕️ HealthEcho does not diagnose or prescribe. For emergencies, call your local emergency number or go to the nearest ER immediately.</div>
+        </div>
+      </div>
+
+      <!-- CHAT SCREEN -->
+      <div class="scr" id="s-chat">
+        <div class="chat-wrap">
+          <div class="chat-hd">
+            <div class="chat-av"><svg viewBox="0 0 24 24"><path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5"/></svg></div>
+            <div>
+              <div style="font-size:13px;font-weight:700">HealthEcho AI</div>
+              <div style="font-size:10px;color:var(--muted)">Medical insights from trusted sources</div>
+            </div>
+            <div class="chat-status">
+              <div class="status-dot"></div>
+              <span>Active</span>
+            </div>
+            <button class="btn btn-ghost btn-sm" onclick="clearChat()" style="margin-left:4px">Clear</button>
+          </div>
+          <div class="chat-msgs" id="msgs">
+            <div class="msg bot fade-in">
+              <div class="msg-lbl">HealthEcho</div>
+              Hello! I'm HealthEcho — I run a <strong>structured clinical intake pipeline</strong> (safety screen → body systems → symptom weighting → disease filter → normalized ranking → suggested tests). References: <strong>WHO · ICMR · CDC · AIIMS · NIH</strong>.<br><br>For the best analysis: share <strong>symptoms · duration · severity</strong>, age &amp; gender (optional), any existing conditions. You can type in <strong>English, Hindi, Hinglish, or Marathi</strong>. <em>Informational only — not a diagnosis; see a qualified clinician.</em>
+            </div>
+          </div>
+          <div class="chips" id="chips">
+            <span class="chip" onclick="chipSend('I have been feeling fatigue, weakness and dizziness for 2 weeks')">😴 Fatigue & Weakness</span>
+            <span class="chip" onclick="chipSend('I have fever, headache and body ache since 3 days')">🌡️ Fever & Body Ache</span>
+            <span class="chip" onclick="chipSend('I have irregular periods, weight gain and acne - possible PCOS')">⚕️ PCOS Symptoms</span>
+            <span class="chip" onclick="chipSend('I have frequent urination, excessive thirst and blurry vision')">🩺 Diabetes Symptoms</span>
+          </div>
+          <div class="inp-area">
+            <div class="inp-row">
+              <button class="cam-inp-btn" onclick="openCamera()" title="Capture report with camera">
+                <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+              </button>
+              <input id="inp" placeholder="Describe your symptoms in detail…" onkeydown="if(event.key==='Enter')doSend()" enterkeyhint="send" autocomplete="off" autocorrect="on" spellcheck="true"/>
+              <button class="send-btn" id="sbtn" onclick="doSend()">
+                <svg viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              </button>
+            </div>
+            <div style="font-size:10px;color:var(--hint);text-align:center;margin-top:7px">⚕️ Not a substitute for professional medical advice</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- UPLOAD SCREEN -->
+      <div class="scr" id="s-upload">
+        <div class="pad">
+          <div class="scr-hd">
+            <h2>Upload Reports</h2>
+            <p>Upload medical reports for automatic AI analysis — PDF or images</p>
+          </div>
+          <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()"
+            ondragover="handleDragOver(event)" ondragleave="handleDragLeave(event)" ondrop="handleDrop(event)">
+            <div style="font-size:40px">📋</div>
+            <h3>Tap to select or drag & drop</h3>
+            <p>Select multiple files at once — up to 20MB each</p>
+            <div class="file-types">
+              <span class="ft">PDF</span><span class="ft">JPG</span><span class="ft">PNG</span><span class="ft">HEIC</span><span class="ft">WEBP</span>
+            </div>
+            <input type="file" id="fileInput" multiple accept=".pdf,image/*" style="display:none" onchange="handleFiles(event)"/>
+          </div>
+
+          <div class="or-row"><div class="or-line"></div><span class="or-txt">or</span><div class="or-line"></div></div>
+          <button class="cam-btn" onclick="openCamera()">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+            📸 Capture Report with Camera
+          </button>
+
+          <div id="uploadQueue" style="display:none"></div>
+
+          <div id="upPreview" style="display:none">
+            <div class="card" id="procCard">
+              <div class="card-title">⚙️ Processing Reports</div>
+              <div id="processList"></div>
+            </div>
+          </div>
+
+          <div id="reportsList" style="display:none">
+            <div class="card-title" style="margin-top:18px">Your Reports (<span id="reportsCount">0</span>)</div>
+            <div id="reportsListInner"></div>
+          </div>
+
+          <!-- Hidden API key input (not exposed to users) -->
+          <input id="groqKeyInput" type="hidden" oninput="saveGroqKey(this.value)"/>
+          <div id="groqKeyStatus" style="display:none"></div>
+
+          <!-- Uploaded image preview section -->
+          <div id="uploadedImagePreview" style="display:none;margin-top:16px">
+            <div class="card-title">📸 Uploaded Report Preview</div>
+            <div id="imagePreviewInner" style="border-radius:var(--radius-lg);overflow:hidden;border:1px solid var(--border);background:var(--bg3);text-align:center;padding:8px"></div>
+          </div>
+
+          <!-- Inline AI Analysis Result (shown right after upload) -->
+          <div id="inlineAnalysisWrap" style="display:none;margin-top:16px">
+            <div class="card">
+              <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;margin-bottom:4px">
+                <div class="card-title" style="margin:0">🤖 AI Report Analysis <span id="analysisLangBadge" style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--blue-l);color:var(--blue);font-weight:700;border:1px solid rgba(96,165,250,.2);margin-left:6px">EN</span></div>
+                <!-- Voice Controls -->
+                <div id="voiceControls" style="display:none;display:flex;gap:6px;align-items:center;flex-wrap:wrap">
+                  <span id="voiceLangBadge" style="font-size:10px;padding:2px 8px;border-radius:10px;background:var(--teal-l);color:var(--teal);font-weight:700;border:1px solid var(--teal-l2)">🔊 EN</span>
+                  <button class="btn btn-sm" id="voicePlayBtn" onclick="voicePlay()" title="Play summary aloud">▶️ Play</button>
+                  <button class="btn btn-sm" id="voicePauseBtn" onclick="voicePause()" style="display:none" title="Pause">⏸ Pause</button>
+                  <button class="btn btn-sm" id="voiceResumeBtn" onclick="voiceResume()" style="display:none" title="Resume">▶️ Resume</button>
+                  <button class="btn btn-sm" id="voiceReplayBtn" onclick="voiceReplay()" title="Replay">🔁 Replay</button>
+                </div>
+              </div>
+              <div id="inlineAnalysisLoading" style="display:none;padding:12px 0;font-size:13px;font-weight:600;color:var(--teal);align-items:center;gap:8px">
+                <span class="spin">⏳</span> <span id="analysisLoadingText">Analyzing your report…</span>
+              </div>
+              <div id="inlineAnalysisBody" style="font-size:13px;color:var(--muted);line-height:1.75"></div>
+            </div>
+          </div>
+
+          <!-- Conclusive Remarks Section -->
+          <div id="conclusionWrap" style="display:none;margin-top:16px">
+            <div class="card" style="border-color:rgba(0,200,150,.3)">
+              <div class="card-title">📋 Conclusive Remarks</div>
+              <div id="conclusionBody" style="font-size:13px;color:var(--muted);line-height:1.8"></div>
+            </div>
+          </div>
+
+          <div class="comp">⚕️ Reports are analyzed using advanced AI vision and text models. Files are stored securely in Firebase Storage. Analysis uses WHO, ICMR, CDC, AIIMS, NIH, Mayo Clinic guidelines.</div>
+        </div>
+      </div>
+
+      <!-- DASHBOARD SCREEN -->
+      <div class="scr" id="s-dashboard">
+        <div class="pad">
+          <div style="margin-bottom:18px">
+            <div style="font-size:11px;color:var(--hint);font-family:var(--mono)" id="dashDate"></div>
+            <div style="font-size:22px;font-weight:700;letter-spacing:-0.03em;margin-top:4px" id="dashGreet">Good morning</div>
+          </div>
+
+          <div id="reportSelectorWrap" style="display:none">
+            <div class="sec-lbl">View Report</div>
+            <div class="report-selector" id="reportSelector"></div>
+          </div>
+
+          <div class="card" id="reportAnalysisWrap" style="display:none">
+            <div class="card-title">📑 Report analysis</div>
+            <div id="reportAnalysisBody" style="font-size:13px;color:var(--muted);line-height:1.75"></div>
+            <div id="reportAnalysisAILoading" style="display:none;margin-top:12px;font-size:13px;font-weight:600;color:var(--teal);align-items:center;gap:8px" class="fade-in">⏳ Analyzing report…</div>
+            <div id="reportAnalysisAI" style="margin-top:12px;font-size:13px;color:var(--muted);line-height:1.75"></div>
+            <button type="button" class="btn btn-outline" style="margin-top:10px;font-size:12px" onclick="runOptionalReportAI()">🤖 Re-analyze with AI</button>
+            <div id="reportAnalysisStats" style="display:flex;flex-wrap:wrap;gap:8px;margin-top:12px"></div>
+          </div>
+
+          <div class="dash-grid" id="metricsGrid">
+            <div class="metric-card mc-normal" style="grid-column:1/-1;text-align:center;padding:36px">
+              <div style="font-size:40px;margin-bottom:10px">📊</div>
+              <div style="font-size:14px;font-weight:600;color:var(--muted)">Upload a medical report to see your health dashboard</div>
+              <button class="btn btn-p" style="margin-top:14px" onclick="switchToTab('upload')">Upload Report →</button>
+            </div>
+          </div>
+
+          <div class="chart-wrap" id="trendWrap" style="display:none">
+            <div class="card-title">📈 Parameter Trends</div>
+            <div style="position:relative;height:220px">
+              <canvas id="trendChart"></canvas>
+            </div>
+          </div>
+
+          <div class="card" id="abnormalWrap" style="display:none">
+            <div class="card-title">⚠️ Abnormal Values</div>
+            <div id="abnormalList"></div>
+          </div>
+
+          <div class="card" id="recsWrap" style="display:none">
+            <div class="card-title">🤖 AI Recommendations</div>
+            <div id="dashRecs" style="font-size:12px;color:var(--muted);line-height:1.9"></div>
+          </div>
+
+          <div class="comp">⚕️ This system provides informational insights only. Please consult a qualified healthcare professional for diagnosis and treatment.</div>
+        </div>
+      </div>
+
+      <!-- HISTORY SCREEN -->
+      <div class="scr" id="s-history">
+        <div class="pad">
+          <div class="scr-hd">
+            <h2>Consultation History</h2>
+            <p>Your past AI consultations</p>
+          </div>
+          <input class="search-inp" id="histSearch" placeholder="🔍  Search symptoms or conditions…" oninput="filterHistory()"/>
+          <div class="filter-row">
+            <button class="filter-btn on" onclick="setFilter(this,'all')">All</button>
+            <button class="filter-btn" onclick="setFilter(this,'high')">High Risk</button>
+            <button class="filter-btn" onclick="setFilter(this,'mod')">Moderate</button>
+            <button class="filter-btn" onclick="setFilter(this,'low')">Low Risk</button>
+          </div>
+          <div id="histList"></div>
+        </div>
+      </div>
+
+      <!-- HOSPITALS SCREEN -->
+      <div class="scr" id="s-hospitals">
+        <div class="pad">
+          <div class="scr-hd">
+            <h2>Find Doctors</h2>
+            <p id="hospScreenSub">Loading hospitals for your city…</p>
+          </div>
+
+          <!-- City source indicator -->
+          <div id="hospCityBar" style="display:none;margin-bottom:12px;padding:10px 14px;background:var(--teal-l);border:1px solid var(--teal-l2);border-radius:var(--radius);font-size:12px;color:var(--teal);display:flex;align-items:center;gap:8px;flex-wrap:wrap">
+            <span id="hospCityBarText">📍 City: —</span>
+            <span id="hospCitySource" style="font-size:10px;background:var(--teal-l2);padding:2px 8px;border-radius:10px;font-weight:700"></span>
+          </div>
+
+          <button class="loc-btn" id="locBtn" onclick="requestLocation()" style="margin-bottom:10px">
+            📍 Use My Location (Optional)
+          </button>
+          <div class="loc-banner" id="locBanner" style="display:none"></div>
+
+          <!-- Pre-location placeholder (shown only when no city available) -->
+          <div id="hospPlaceholder" style="text-align:center;padding:56px 24px;color:var(--muted)">
+            <div style="font-size:52px;margin-bottom:14px">🏥</div>
+            <div style="font-size:15px;font-weight:700;color:var(--text);margin-bottom:8px">Setting up hospital listing…</div>
+            <div style="font-size:13px;line-height:1.7">Sign in to auto-load hospitals for your city, or click <strong style="color:var(--teal)">"Use My Location"</strong> above.</div>
+          </div>
+
+          <!-- Hospital list — shown once city is available -->
+          <div id="hospAfterLocation" style="display:none">
+            <div class="srch">
+              <input id="hospSearch" placeholder="Search hospital, specialty…" oninput="filterHospitals()" autocomplete="off" enterkeyhint="search"/>
+              <button class="btn btn-p btn-sm" onclick="filterHospitals()">Go</button>
+            </div>
+            <div class="filter-row" id="hospFilters" style="flex-wrap:wrap;gap:6px">
+              <button class="filter-btn on" onclick="setHospFilter(this,'all')">All</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'general')">General</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'eye')">👁 Eye Specialist</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'dental')">🦷 Dental</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'homeopathy')">🌿 Homeopathy</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'ayurvedic')">🍃 Ayurvedic</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'pediatric')">👶 Pediatric</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'dermatology')">🧴 Dermatology</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'ent')">👂 ENT</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'cardiology')">❤️ Cardiology</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'gynecology')">🏥 Gynecology</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'orthopedic')">🦴 Orthopedic</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'government')">Govt</button>
+              <button class="filter-btn" onclick="setHospFilter(this,'private')">Private</button>
+            </div>
+            <div id="hospList"></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- PROFILE SCREEN -->
+      <div class="scr" id="s-profile">
+        <div class="pad">
+          <div class="prof-hd">
+            <div class="av-lg" id="profAv">G</div>
+            <div>
+              <div class="prof-name" id="profName">Guest User</div>
+              <div class="prof-sub" id="profSub">Login to save your health history</div>
+            </div>
+          </div>
+          <div class="card-title">Language</div>
+          <div style="font-size:11px;color:var(--muted);margin-bottom:8px;line-height:1.6">
+            🌐 Report summaries, conclusions, and voice output will be generated in the selected language.
+          </div>
+          <div class="lang-row">
+            <button class="lbtn on" data-lang="en" onclick="setLanguage('en',this)">English</button>
+            <button class="lbtn" data-lang="hi" onclick="setLanguage('hi',this)">हिंदी</button>
+            <button class="lbtn" data-lang="mr" onclick="setLanguage('mr',this)">मराठी</button>
+            <button class="lbtn" data-lang="bn" onclick="setLanguage('bn',this)">বাংলা</button>
+            <button class="lbtn" data-lang="ta" onclick="setLanguage('ta',this)">தமிழ்</button>
+          </div>
+          <div style="padding:0 2px">
+            <div class="mi" id="profLoginBtn" onclick="showModal('loginModal')">
+              <div class="mi-l"><div class="mi-dot" style="background:var(--teal)"></div><span>Login / Sign Up</span></div><span class="ar">›</span>
+            </div>
+            <div class="mi" onclick="switchToTab('upload')">
+              <div class="mi-l"><div class="mi-dot" style="background:var(--blue)"></div><span>My Reports</span></div><span class="ar">›</span>
+            </div>
+            <div class="mi" onclick="goHistory()">
+              <div class="mi-l"><div class="mi-dot" style="background:var(--purple)"></div><span>Consultation History</span></div><span class="ar">›</span>
+            </div>
+            <div class="mi" onclick="showFeedback()">
+              <div class="mi-l"><div class="mi-dot" style="background:var(--amber)"></div><span>Send Feedback</span></div><span class="ar">›</span>
+            </div>
+            <div class="mi" onclick="showRoboGuide()">
+              <div class="mi-l"><div class="mi-dot" style="background:var(--teal)"></div><span>App Guide</span></div><span class="ar">›</span>
+            </div>
+            <div class="mi" id="logoutMi" style="display:none" onclick="doLogout()">
+              <div class="mi-l"><div class="mi-dot" style="background:var(--red)"></div><span style="color:var(--red)">Logout</span></div><span class="ar">›</span>
+            </div>
+          </div>
+          <div class="comp">HealthEcho v5.0 · Firebase Auth · Firestore · AI Vision · Browser OCR<br>Sources: WHO · ICMR · CDC · AIIMS · NIH · Mayo Clinic<br>⚕️ Informational insights only. Always consult a qualified healthcare professional.</div>
+        </div>
+      </div>
+
+    </div><!-- end screens wrapper -->
+
+    <!-- MOBILE TABS -->
+    <div class="tabs">
+      <div class="tab on" data-t="home" onclick="switchToTab('home')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Home
+      </div>
+      <div class="tab" data-t="chat" onclick="switchToTab('chat')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+        Consult
+      </div>
+      <div class="tab" data-t="upload" onclick="switchToTab('upload')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="16 16 12 12 8 16"/><line x1="12" y1="12" x2="12" y2="21"/><path d="M20.39 18.39A5 5 0 0018 9h-1.26A8 8 0 103 16.3"/></svg>
+        Upload
+      </div>
+      <div class="tab" data-t="dashboard" onclick="switchToTab('dashboard')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </div>
+      <div class="tab nav-history-item" data-t="history" onclick="switchToTab('history')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="12 8 12 12 14 14"/><path d="M3.05 11a9 9 0 108.91-7.96"/><polyline points="3 4 3 11 10 11"/></svg>
+        History
+      </div>
+      <div class="tab" data-t="hospitals" onclick="switchToTab('hospitals')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        Doctors
+      </div>
+      <div class="tab" data-t="profile" onclick="switchToTab('profile')">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </div>
+    </div>
+
+  </div><!-- end main-area -->
+</div><!-- end app -->
+
+<!-- CAMERA MODAL -->
+<div class="camera-modal" id="cameraModal">
+  <video id="cameraVideo" autoplay playsinline></video>
+  <div class="camera-controls">
+    <button class="cam-capture-btn" onclick="capturePhoto()" title="Capture"></button>
+    <canvas id="cameraCanvas" style="display:none"></canvas>
+  </div>
+  <button class="cam-close-btn" onclick="closeCamera()">✕</button>
+  <div style="position:absolute;bottom:80px;color:rgba(255,255,255,.6);font-size:12px;text-align:center">Position your medical report in frame, then tap to capture</div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast"></div>
+
+<!-- PARAM EXPLANATION POPUP -->
+<div class="param-popup" id="paramPopup" onclick="if(event.target===this)hideParamPopup()">
+  <div class="param-popup-inner">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+      <div style="font-size:16px;font-weight:700" id="ppTitle"></div>
+      <button onclick="hideParamPopup()" style="background:none;border:none;cursor:pointer;font-size:20px;color:var(--hint)">✕</button>
+    </div>
+    <div id="ppContent"></div>
+  </div>
+</div>
+
+<!-- FEEDBACK POPUP -->
+<div class="feedback-popup" id="feedbackPopup">
+  <button class="fb-close" onclick="hideFeedback()">✕</button>
+  <div class="fb-title">How's your experience? 💬</div>
+  <div class="fb-sub">Help us improve HealthEcho</div>
+  <div class="star-row">
+    <button class="star-btn" onclick="setRating(1)">⭐</button>
+    <button class="star-btn" onclick="setRating(2)">⭐</button>
+    <button class="star-btn" onclick="setRating(3)">⭐</button>
+    <button class="star-btn" onclick="setRating(4)">⭐</button>
+    <button class="star-btn" onclick="setRating(5)">⭐</button>
+  </div>
+  <div class="form-group" style="margin-bottom:10px">
+    <textarea id="fbComment" placeholder="Any comments? (optional)" style="min-height:60px"></textarea>
+  </div>
+  <button class="modal-btn" onclick="submitFeedback()">Submit Feedback</button>
+</div>
+
+<!-- ROBO GUIDE OVERLAY -->
+<div class="robo-overlay" id="roboOverlay">
+  <div class="robo-card">
+    <div class="robo-anim">🤖</div>
+    <div class="robo-title" id="roboTitle">Welcome to HealthEcho!</div>
+    <div class="robo-msg" id="roboMsg">Your AI health companion.</div>
+    <div class="robo-dots" id="roboDots"></div>
+    <div class="robo-steps" id="roboSteps"></div>
+    <div class="robo-btns">
+      <button class="robo-skip" onclick="closeRobo()">Skip</button>
+      <button class="robo-next" id="roboNextBtn" onclick="roboNext()">Next →</button>
+    </div>
+  </div>
+</div>
+
+<!-- LOGIN MODAL -->
+<div class="modal-bg" id="loginModal" onclick="if(event.target===this)hideModal('loginModal')">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="hideModal('loginModal')">✕</button>
+    <h2>Welcome back</h2>
+    <p class="modal-sub">Login to HealthEcho</p>
+    <div class="tab-switch">
+      <button class="ts-btn on" id="lTab1" onclick="switchLoginTab(1)">Email / Password</button>
+      <button class="ts-btn" id="lTab2" onclick="switchLoginTab(2)">Phone OTP</button>
+    </div>
+    <div id="loginForm1">
+      <div class="auth-error" id="loginError"></div>
+      <div class="form-group"><label>Email</label><input id="lEmail" type="email" placeholder="you@email.com" autocomplete="email" inputmode="email"/></div>
+      <div class="form-group"><label>Password</label><input id="lPassword" type="password" placeholder="Your password" autocomplete="current-password"/></div>
+      <!-- ── Forgot Password link ── Added without changing any existing login logic -->
+      <span class="forgot-link" onclick="openForgotPassword()" title="Reset your password via email">Forgot Password?</span>
+      <button class="modal-btn" onclick="doEmailLogin()">Login</button>
+    </div>
+    <div id="loginForm2" style="display:none">
+      <div class="auth-error" id="loginPhoneError"></div>
+      <div class="form-group"><label>Phone Number</label><input id="lPhone" type="tel" placeholder="+91 9876543210" autocomplete="tel" inputmode="tel"/></div>
+      <div id="recaptcha-container"></div>
+      <button class="modal-btn" id="sendOtpBtn" onclick="sendPhoneOTP('login')">Send OTP via Firebase</button>
+      <div id="otpSection" style="display:none">
+        <div style="text-align:center;margin:16px 0 8px;font-size:13px;color:var(--muted)">Enter 6-digit OTP sent to your phone</div>
+        <div class="otp-wrap" id="loginOtps">
+          <input class="otp-inp" maxlength="1" oninput="otpNav(this,0,'loginOtps')"/>
+          <input class="otp-inp" maxlength="1" oninput="otpNav(this,1,'loginOtps')"/>
+          <input class="otp-inp" maxlength="1" oninput="otpNav(this,2,'loginOtps')"/>
+          <input class="otp-inp" maxlength="1" oninput="otpNav(this,3,'loginOtps')"/>
+          <input class="otp-inp" maxlength="1" oninput="otpNav(this,4,'loginOtps')"/>
+          <input class="otp-inp" maxlength="1" oninput="otpNav(this,5,'loginOtps')"/>
+        </div>
+        <div class="otp-timer">Resend OTP in <span id="otpCountdown">30s</span></div>
+        <button class="modal-btn" onclick="verifyPhoneOTP('login')">Verify &amp; Login</button>
+      </div>
+    </div>
+    <div class="divider"><div class="div-line"></div><span class="div-txt">Don't have an account?</span><div class="div-line"></div></div>
+    <button class="btn btn-outline" style="width:100%;padding:12px" onclick="hideModal('loginModal');showModal('signupModal')">Create Account</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════
+     FORGOT PASSWORD MODAL
+     — Standalone modal; does NOT touch any existing login/signup/OTP flow
+     — Uses Firebase sendPasswordResetEmail (secure — password never exposed)
+     — Session-level rate-limit: one request per 60 s to prevent abuse
+     — Mobile-friendly: keyboard won't cover input; touch-sized button
+     ═══════════════════════════════════════════════════════ -->
+<div class="modal-bg" id="forgotPasswordModal" onclick="if(event.target===this)closeForgotPassword()">
+  <div class="modal" style="position:relative;max-width:480px">
+    <button class="modal-close" onclick="closeForgotPassword()" aria-label="Close">✕</button>
+
+    <h2>Forgot Password?</h2>
+    <p class="modal-sub">Enter your registered email — we'll send a secure reset link.</p>
+
+    <!-- Success state (shown after email is dispatched) -->
+    <div class="fp-success" id="fpSuccess">
+      ✅ Password reset link has been sent to your email.<br>
+      <span style="font-size:11px;color:var(--muted)">Please check your inbox (and spam folder).</span>
+    </div>
+
+    <!-- Error state -->
+    <div class="auth-error" id="fpError"></div>
+
+    <!-- Email input (hidden after success so user can't spam) -->
+    <div class="form-group" id="fpInputWrap">
+      <label>Registered Email Address</label>
+      <input id="fpEmail" type="email" placeholder="you@email.com" autocomplete="email" inputmode="email"
+             oninput="document.getElementById('fpError').style.display='none'"
+             onkeydown="if(event.key==='Enter')doForgotPassword()"/>
+    </div>
+
+    <!-- Send button — shows spinner while in-flight -->
+    <button class="modal-btn" id="fpBtn" onclick="doForgotPassword()"
+            style="display:flex;align-items:center;justify-content:center;gap:6px"
+            aria-label="Send password reset email">
+      <span class="fp-spinner" id="fpSpinner"></span>
+      <span id="fpBtnText">Send Reset Link</span>
+    </button>
+
+    <div class="divider"><div class="div-line"></div><span class="div-txt">Remembered it?</span><div class="div-line"></div></div>
+    <button class="btn btn-outline" style="width:100%;padding:12px"
+            onclick="closeForgotPassword();showModal('loginModal')">Back to Login</button>
+  </div>
+</div>
+
+<!-- SIGNUP MODAL -->
+<div class="modal-bg" id="signupModal" onclick="if(event.target===this)hideModal('signupModal')" >
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="hideModal('signupModal')">✕</button>
+    <h2>Create account</h2>
+    <p class="modal-sub">Join HealthEcho — your health, secured</p>
+    <div class="auth-error" id="signupError"></div>
+    <div class="form-group"><label>Full Name</label><input id="sName" type="text" placeholder="Priya Sharma" autocomplete="name"/></div>
+    <div class="form-row">
+      <div class="form-group"><label>Age</label><input id="sAge" type="number" placeholder="23" min="1" max="120"/></div>
+      <div class="form-group"><label>Gender</label>
+        <select id="sGender"><option value="">Select</option><option>Female</option><option>Male</option><option>Other</option></select>
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="form-group"><label>City</label><input id="sCity" type="text" placeholder="Amravati"/></div>
+      <div class="form-group"><label>State</label><input id="sState" type="text" placeholder="Maharashtra"/></div>
+    </div>
+    <div class="form-group"><label>Phone Number</label><input id="sPhone" type="tel" placeholder="+91 9876543210" autocomplete="tel" inputmode="tel"/></div>
+    <div class="form-group"><label>Email</label><input id="sEmail" type="email" placeholder="you@email.com" autocomplete="email" inputmode="email"/></div>
+    <div class="form-group"><label>Password</label><input id="sPassword" type="password" placeholder="Min 8 characters" autocomplete="new-password"/></div>
+    <div id="recaptcha-container-signup"></div>
+    <button class="modal-btn" id="signupBtn" onclick="doSignup()">Create Account</button>
+    <div class="divider"><div class="div-line"></div><span class="div-txt">Already have an account?</span><div class="div-line"></div></div>
+    <button class="btn btn-outline" style="width:100%;padding:12px" onclick="hideModal('signupModal');showModal('loginModal')">Login</button>
+  </div>
+</div>
+
+<!-- BOOKING MODAL -->
+<div class="modal-bg" id="bookModal" onclick="if(event.target===this)hideModal('bookModal')">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="hideModal('bookModal')">✕</button>
+    <h2 id="bookHospName">Book Appointment</h2>
+    <p class="modal-sub" id="bookHospSub"></p>
+    <div class="sec-lbl">Select Doctor</div>
+    <div class="doc-row" id="docRow"></div>
+    <div class="sec-lbl">Select Date</div>
+    <div class="date-row" id="dateRow"></div>
+    <div class="sec-lbl">Select Time</div>
+    <div class="time-grid" id="timeGrid"></div>
+    <button class="modal-btn" onclick="confirmBooking()">Confirm Appointment</button>
+  </div>
+</div>
+
+<!-- HISTORY DETAIL MODAL -->
+<div class="modal-bg" id="histModal" onclick="if(event.target===this)hideModal('histModal')">
+  <div class="modal" style="position:relative">
+    <button class="modal-close" onclick="hideModal('histModal')">✕</button>
+    <h2>Consultation Detail</h2>
+    <div id="histDetail" style="margin-top:16px"></div>
+  </div>
+</div>
+
+<!-- Main Application Script -->
+<script src="app.js" defer></script>
+</body>
+</html>
