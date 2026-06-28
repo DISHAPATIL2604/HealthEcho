@@ -8,7 +8,6 @@ HealthEcho is an educational clinical intake assistant and dashboard designed to
 HealthEcho/
 ├── .gitignore
 ├── README.md
-├── healthecho_v5_improved.html  <-- Original backup file (do not delete)
 ├── backend/                     <-- Python FastAPI Backend
 │   ├── main.py
 │   ├── requirements.txt
