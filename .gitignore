@@ -1,0 +1,23 @@
+# Local Configurations & Secrets
+frontend/config.js
+backend/.env
+.env
+
+# Databases
+backend/*.db
+*.db
+
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+venv/
+.venv/
+env/
+.env/
+
+# OS and Editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
